@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.DeviceDownloadMapper">
+    <resultMap id="DownResourceResultMap" type="com.zgj.mps.bean.DeviceDownloadBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="resourceId" jdbcType="SMALLINT" property="resourceId"/>
+        <result column="device_mac" jdbcType="SMALLINT" property="deviceMac"/>
+        <result column="progress" jdbcType="SMALLINT" property="progress"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+    </resultMap>
+    <resultMap id="BaseResultMap" type="com.zgj.mps.bean.DevicePageBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="device_mac" jdbcType="SMALLINT" property="deviceMac"/>
+        <result column="progress" jdbcType="SMALLINT" property="progress"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+    </resultMap>
+    <select id="devicerDownList" parameterType="java.lang.String" resultMap="DownResourceResultMap">
+        SELECT
+        dep.id,
+        dep. STATUS,
+        dep.progress,
+        dep.device_mac,
+        dep.resource_id AS resourceId,
+        r. NAME AS resourceName,
+        r.url
+        FROM
+        (
+        SELECT
+        t.id,
+        t. STATUS,
+        t.resource_id,
+        t.progress,
+        t.device_mac
+        FROM
+        device_download t
+        WHERE
+        1 = 1
+        <if test="userId != '' and userId != null">
+            and t.user_id=#{userId}
+        </if>
+        <if test="deviceMac != '' and deviceMac != null">
+            and t.device_mac=#{deviceMac}
+        </if>
+        ) dep
+        LEFT JOIN resource r ON dep.resource_id = r.id
+    </select>
+    <select id="deviceDownList" parameterType="com.zgj.mps.bean.DeviceDownloadBean" resultMap="BaseResultMap">
+        SELECT d.id,d.status,d.create_time,d.device_mac,d.progress,t.account, t.name,t.avatar,r.name as resourceName,r.pro_img from device_download d,user t,resource r
+        where d.user_id=t.id and d.resource_id=r.id
+        and d.is_delete=0 and r.is_delete=0
+        <if test="devicePageBean.resourceName!=null and devicePageBean.resourceName!=''">
+            and r.name like CONCAT('%',#{devicePageBean.resourceName},'%')
+        </if>
+        <if test="devicePageBean.account!=null and devicePageBean.account!=''">
+            and t.account like CONCAT('%',#{devicePageBean.account},'%')
+        </if>
+        <if test="devicePageBean.name!=null and devicePageBean.name!=''">
+            and t.name like CONCAT('%',#{devicePageBean.name},'%')
+        </if>
+        <if test="devicePageBean.deviceMac!=null and devicePageBean.deviceMac!=''">
+            and t.device_mac like CONCAT('%',#{devicePageBean.deviceMac},'%')
+        </if>
+        and d.status=#{devicePageBean.status}
+        Order by d.create_time desc
+    </select>
+</mapper>

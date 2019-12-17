@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.RateMapper">
+    <resultMap id="BaseResultMap" type="com.zgj.mps.bean.RateBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="mark" jdbcType="BIGINT" property="mark"/>
+        <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+        <result column="publisher_mame" jdbcType="VARCHAR" property="publisherName"/>
+        <result column="is_nick" jdbcType="SMALLINT" property="isNick"/>
+        <result column="is_delete" jdbcType="SMALLINT" property="isDelete"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+    </resultMap>
+    <resultMap id="rateStasticResultMap" type="com.zgj.mps.bean.RateStasticBean">
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="avgMark" jdbcType="BIGINT" property="avgMark"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+        <result column="rateCount" jdbcType="INTEGER" property="rateCount"/>
+    </resultMap>
+    <resultMap id="DwonTopResultMap" type="com.zgj.mps.bean.DownloadTopBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="total" jdbcType="INTEGER" property="total"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <select id="pageRate" parameterType="com.zgj.mps.bean.RateBean" resultMap="BaseResultMap">
+        SELECT r.*,u.account,u.name,u.avatar,t1.name as resourceName,t1.pro_img
+        from rate r,user u,resource t1
+        where r.user_id=u.id and r.resource_id=t1.id
+        <if test="rateBean.resourceName!=null and rateBean.resourceName!=''">
+            and t1.name like CONCAT('%',#{rateBean.resourceName},'%')
+        </if>
+        <if test="rateBean.account!=null and rateBean.account!=''">
+            and u.account like CONCAT('%',#{rateBean.account},'%')
+        </if>
+        <if test="rateBean.name!=null and rateBean.name!=''">
+            and u.name like CONCAT('%',#{rateBean.name},'%')
+        </if>
+        <if test="rateBean.resourceId!=null and rateBean.resourceId!=''">
+            and r.resource_id =#{rateBean.resourceId}
+        </if>
+        <if test="rateBean.isNick!=null and rateBean.isNick!=''">
+            and r.is_nick =#{rateBean.isNick}
+        </if>
+        Order by r.create_time desc
+    </select>
+    <select id="pageRateStastic" parameterType="com.zgj.mps.bean.RateBean"
+            resultMap="rateStasticResultMap">
+         SELECT r.resource_id,avg(r.mark) as avgMark,t1.name as resourceName,t1.pro_img,count(r.resource_id) as rateCount
+        from rate r,user u,resource t1
+        where r.user_id=u.id and r.resource_id=t1.id
+        <if test="rateBean.resourceName!=null and rateBean.resourceName!=''">
+            and t1.name like CONCAT('%',#{rateBean.resourceName},'%')
+        </if>
+        group by r.resource_id
+        resourceOrder BY avgMark desc
+    </select>
+    <select id="getMonthDownload" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+        SELECT
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '1' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '1',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '2' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '2',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '3' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '3',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '4' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '4',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '5' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '5',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '6' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '6',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '7' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '7',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '8' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '8',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '9' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '9',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '10' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '10',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '11' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '11',
+        SUM(
+            CASE MONTH (create_time)
+            WHEN '12' THEN
+                1
+            ELSE
+                0
+            END
+        ) AS '12'
+    FROM
+        rate
+    WHERE
+    YEAR (create_time) =#{year}
+    </select>
+    <select id="downloadTop10" resultMap="DwonTopResultMap">
+        SELECT o.*,r.name FROM(
+          SELECT COUNT(id) as total, t.resource_id FROM rate t  GROUP BY resource_id ORDER BY total desc LIMIT 0,10) o LEFT JOIN resource r on o.resource_id=r.id
+    </select>
+</mapper>

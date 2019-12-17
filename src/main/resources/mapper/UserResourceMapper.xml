@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.UserResourceMapper">
+    <resultMap id="BaseResultMap" type="com.zgj.mps.model.UserResource">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="INTEGER" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="is_forever" jdbcType="SMALLINT" property="isForever"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+    </resultMap>
+    <resultMap id="userResourceResultMap" type="com.zgj.mps.bean.UserResourceBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="is_forever" jdbcType="SMALLINT" property="isForever"/>
+
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+        <result column="pro_video" jdbcType="VARCHAR" property="proVideo"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="is_delete" jdbcType="VARCHAR" property="isDelete"/>
+    </resultMap>
+    <resultMap id="userAuthResultMap" type="com.zgj.mps.bean.UserAuthBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="is_forever" jdbcType="SMALLINT" property="isForever"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="rCount" jdbcType="VARCHAR" property="rCount"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+    </resultMap>
+    <resultMap id="UserDytpeResult" type="com.zgj.mps.bean.UserResourceDtypeBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="is_forever" jdbcType="SMALLINT" property="isForever"/>
+        <result column="status" jdbcType="SMALLINT" property="status"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+        <result column="pro_video" jdbcType="VARCHAR" property="proVideo"/>
+    </resultMap>
+    <resultMap id="authResourceResutlMap" type="com.zgj.mps.bean.AturhResourceBean">
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="INTEGER" property="endTime"/>
+        <result column="url" jdbcType="INTEGER" property="url"/>
+        <result column="is_forever" jdbcType="VARCHAR" property="isForever"/>
+    </resultMap>
+    <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into user_resource(id,start_time,end_time,user_id,resource_id,create_time,is_forever) values
+        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
+            (#{item.id},#{item.startTime},#{item.endTime},#{item.userId},#{item.resourceId},#{item.createTime},#{item.isForever})
+        </foreach>
+    </insert>
+    <select id="userResourceByUid" parameterType="java.lang.Long" resultMap="userResourceResultMap">
+        SELECT
+        t.*,r.name,r.title,r.url,r.pro_img,r.pro_video,r.content,r.is_delete
+        from user_resource t,resource r where t.resource_id=r.id and t.user_id=#{uid}
+    </select>
+    <select id="userAuthData" parameterType="java.lang.String" resultMap="userAuthResultMap">
+        SELECT t.id,t.start_time,t.end_time,t.is_forever,t.user_id,COUNT(t.resource_id) as
+        rCount,u.name,u.avatar,t.status
+        from user_resource t , user u where t.user_id=u.id
+        <if test="name!=null and name!=''">
+            and u.name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="isForever!=null">
+            and t.is_forever=#{isForever}
+        </if>
+        GROUP BY t.user_id
+    </select>
+    <update id="updateUrIsforever" parameterType="com.zgj.mps.model.UserResource">
+            update user_resource
+            set is_forever = #{isForever}
+            where user_id=#{userId}
+    </update>
+    <update id="updateUrStatus" parameterType="com.zgj.mps.model.UserResource">
+            update user_resource
+            set status = #{status}
+            where user_id=#{userId}
+    </update>
+    <select id="userResourceByDtype" resultMap="UserDytpeResult">
+        SELECT obj.id,obj.start_time,obj.end_time,obj.resource_id,obj.is_forever,obj.status,obj.user_id,r.`name` as
+        resourceName,r.url,r.pro_img,r.pro_video
+        FROM(SELECT * FROM user_resource ur where ur.user_id=#{userId,jdbcType=VARCHAR}) obj
+        LEFT JOIN resource r
+        on obj.resource_id=r.id
+        and r.type_id in
+        <foreach collection="typeIds" item="id" index="index"
+                 open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectUrByUidAndRid" resultMap="authResourceResutlMap">
+        SELECT r.url,r.name as resourceName,dep.start_time,dep.end_time,dep.is_forever  from (
+        SELECT t.user_id,t.start_time,t.end_time,t.is_forever,t.resource_id from user_resource t where t.resource_id=#{rid} and t.user_id=#{userId}) dep
+        LEFT JOIN resource r on dep.resource_id=r.id
+    </select>
+</mapper>

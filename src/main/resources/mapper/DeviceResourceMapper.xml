@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.DeviceResourceMapper">
+    <resultMap id="deviceResourceResultMap" type="com.zgj.mps.bean.DeviceResourceBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+        <result column="pro_video" jdbcType="VARCHAR" property="proVideo"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="is_delete" jdbcType="VARCHAR" property="isDelete"/>
+
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="device_mac" jdbcType="VARCHAR" property="deviceMac"/>
+        <result column="device_type_id" jdbcType="VARCHAR" property="deviceTypeId"/>
+    </resultMap>
+    <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into device_resource(id,device_id,resource_id) values
+            (#{item.id},#{item.deviceId},#{item.resourceId})
+        </foreach>
+    </insert>
+    <select id="deviceResourceByDid" parameterType="java.lang.String" resultMap="deviceResourceResultMap">
+        SELECT
+        dr.*,d.device_name,d.device_mac,d.device_type_id,r.name,r.title,r.pro_img
+        FROM device_resource dr,device d,resource r
+        where dr.device_id=d.id
+        and dr.resource_id=r.id
+        and dr.device_id=#{deviceId}
+    </select>
+    <select id="deviceResourceByDeviceType" parameterType="java.lang.String" resultMap="deviceResourceResultMap">
+        SELECT
+        dr.*,d.device_name,d.device_mac,d.device_type_id,r.name,r.title,r.pro_img
+        FROM device_resource dr,device d,resource r,device_type dt
+        where dr.device_id=d.id
+        and dr.resource_id=r.id
+        and d.device_type_id = dt.id
+        and dt.name=#{deviceType}
+    </select>
+</mapper>

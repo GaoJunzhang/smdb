@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.zgj.mps.bean.OrderResourceBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="resource_id" jdbcType="VARCHAR" property="resourceId"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="is_forever" jdbcType="VARCHAR" property="isForever"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="device_mac" jdbcType="VARCHAR" property="deviceMac"/>
+        <result column="typeName" jdbcType="VARCHAR" property="typeName"/>
+        <result column="pro_img" jdbcType="VARCHAR" property="proImg"/>
+    </resultMap>
+    <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into resource_order(id,device_id,type_id,user_id,resource_id,start_time,end_time,is_forever,create_time,create_by,is_delete,device_mac) values
+            (#{item.id},#{item.deviceId},#{item.typeId},#{item.userId},#{item.resourceId},#{item.startTime},#{item.endTime},#{item.isForever},#{item.createTime},#{item.createBy},#{item.isDelete},#{item.deviceMac})
+        </foreach>
+    </insert>
+    <select id="orders" parameterType="com.zgj.mps.bean.OrderResourceBean" resultMap="BaseResultMap">
+        SELECT t.status,t.id,t.device_id,t.device_mac,t.type_id,t.resource_id,t.start_time,t.end_time,t.is_forever,t.create_time,r.url,r.name as resourceName,dt.name as typeName,r.pro_img
+        from resource_order t ,resource r,device_type dt
+        where t.resource_id=r.id
+        and t.type_id=dt.id
+        and t.is_delete =0
+        and r.is_delete=0
+        and dt.is_delete=0
+        <if test="order.typeId!=null and order.typeId!=''">
+            and t.type_id=#{order.typeId}
+        </if>
+        <if test="order.typeName!=null and order.typeName!=''">
+          and dt.name =#{order.typeName}
+        </if>
+        <if test="order.deviceMac!=null and order.deviceMac!=''">
+            and t.device_mac=#{order.deviceMac}
+        </if>
+        <if test="order.deviceId!=null and order.deviceId!=''">
+            and t.device_id = #{order.deviceId}
+        </if>
+    </select>
+    <select id="selectOrderPage" resultMap="BaseResultMap">
+
+        SELECT t.status,t.id,t.device_id,t.device_mac,t.type_id,t.resource_id,t.start_time,t.end_time,t.is_forever,t.create_time,r.url,r.name as resourceName,dt.name as typeName
+        from resource_order t ,resource r,device_type dt
+        where t.resource_id=r.id
+        and t.type_id=dt.id
+        and t.is_delete =0
+        and r.is_delete=0
+        and dt.is_delete=0
+        <if test="order.typeId!=null and order.typeId!=''">
+            and t.type_id=#{order.typeId}
+        </if>
+        <if test="order.typeName!=null and order.typeName!=''">
+            and dt.name =#{order.typeName}
+        </if>
+        <if test="order.deviceMac!=null and order.deviceMac!=''">
+            and t.device_mac=#{order.deviceMac}
+        </if>
+    </select>
+    <update id="updateIsforever" parameterType="java.util.List" useGeneratedKeys="false">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update resource_order
+                set is_forever = #{item.isForever}
+            where id=#{item.id}
+        </foreach>
+    </update>
+    <update id="updateStatus" parameterType="java.util.List" useGeneratedKeys="false">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update resource_order
+            set is_forever = #{item.isForever}
+            where id=#{item.id}
+        </foreach>
+    </update>
+</mapper>

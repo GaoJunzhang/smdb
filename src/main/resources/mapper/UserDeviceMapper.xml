@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.UserDeviceMapper">
+    <resultMap id="userDeviceResultMap" type="com.zgj.mps.bean.UserDeviceBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="is_forever" jdbcType="VARCHAR" property="isForever"/>
+        <result column="is_delete" jdbcType="VARCHAR" property="isDelete"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="INTEGER" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="device_mac" jdbcType="VARCHAR" property="deviceMac"/>
+        <result column="device_type_id" jdbcType="VARCHAR" property="deviceTypeId"/>
+        <result column="deviceTypeName" jdbcType="VARCHAR" property="deviceTypeName"/>
+    </resultMap>
+    <resultMap id="resourceAuthResultMap" type="com.zgj.mps.bean.ResourceAuthBean">
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="is_forever" jdbcType="VARCHAR" property="isForever"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="INTEGER" property="endTime"/>
+        <result column="deviceTypeName" jdbcType="VARCHAR" property="deviceTypeName"/>
+        <result column="device_mac" jdbcType="VARCHAR" property="deviceMac"/>
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+    </resultMap>
+    <resultMap id="authResourceResutlMap" type="com.zgj.mps.bean.AturhResourceBean">
+        <result column="resourceName" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="INTEGER" property="endTime"/>
+        <result column="url" jdbcType="INTEGER" property="url"/>
+        <result column="is_forever" jdbcType="VARCHAR" property="isForever"/>
+    </resultMap>
+    <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into user_device(id,start_time,end_time,user_id,device_id,create_time,is_forever,is_delete) values
+            (#{item.id},#{item.startTime},#{item.endTime},#{item.userId},#{item.deviceId},#{item.createTime},#{item.isForever},#{item.isDelete})
+        </foreach>
+    </insert>
+    <select id="userDeviceByUid" parameterType="java.lang.Long" resultMap="userDeviceResultMap">
+        SELECT
+        t.*,u.account,u.avatar,u.mobile,d.device_name,d.device_mac,d.device_type_id,dt.name as deviceTypeName
+        from user_device t,user u,device d,device_type dt
+         where t.user_id=u.id
+         and t.device_id=d.id
+         and d.device_type_id=dt.id
+         and t.user_id=#{uid}
+         and t.is_delete = 0
+    </select>
+
+    <select id="deviceByUidAndTYpe" parameterType="java.lang.String" resultMap="userDeviceResultMap">
+        SELECT
+        t.*,u.account,u.avatar,u.mobile,d.device_name,d.device_mac,d.device_type_id,dt.name as deviceTypeName
+        from user_device t,user u,device d,device_type dt
+         where t.user_id=u.id
+         and t.device_id=d.id
+         and d.device_type_id=dt.id
+         and t.user_id=#{uid}
+        and dt.name=#{typeName}
+    </select>
+    <select id="resourceAuthByDeviceType" parameterType="java.lang.String" resultMap="resourceAuthResultMap">
+      SELECT d.device_name,d.device_mac,r.name as resourceName,ud.start_time,ud.end_time,ud.is_forever,dt.name as deviceTypeName from user_device ud ,device d,device_type dt,device_resource dr ,resource r
+      where ud.device_id=d.id
+      and d.device_type_id = dt.id
+      and d.id = dr.device_id
+      and dr.resource_id=r.id
+      AND ud.user_id=#{uid}
+      and dt.name=#{typeName}
+    </select>
+    <select id="resourceAuthByDeviceTypeAndRid" parameterType="java.lang.String" resultMap="authResourceResutlMap">
+      SELECT r.url,r.name as resourceName,ud.start_time,ud.end_time,ud.is_forever
+      from user_device ud ,device d,device_type dt,device_resource dr ,resource r
+      where ud.device_id=d.id
+      and d.device_type_id = dt.id
+      and d.id = dr.device_id
+      and dr.resource_id=r.id
+      AND ud.user_id=#{uid}
+      and dt.name=#{typeName}
+      and r.id=#{rid}
+    </select>
+    <select id="resourceAuthByDeviceMacAndRid" parameterType="java.lang.String" resultMap="authResourceResutlMap">
+      SELECT ud.id,r.url,r.name as resourceName,ud.start_time,ud.end_time,ud.is_forever,d.device_mac
+      from user_device ud ,device d,device_type dt,device_resource dr ,resource r
+      where ud.device_id=d.id
+      and d.device_type_id = dt.id
+      and d.id = dr.device_id
+      and dr.resource_id=r.id
+      AND ud.user_id=#{uid}
+      and d.device_mac=#{deviceMac}
+      and r.id=#{rid}
+    </select>
+</mapper>

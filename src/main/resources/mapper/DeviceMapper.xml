@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zgj.mps.dao.mapper.DeviceMapper">
+    <resultMap id="BaseResultMap" type="com.zgj.mps.bean.DeviceBean">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="device_mac" jdbcType="VARCHAR" property="deviceMac"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="enable" jdbcType="VARCHAR" property="enable"/>
+        <result column="device_type_id" jdbcType="VARCHAR" property="deviceTypeId"/>
+        <result column="field1" jdbcType="VARCHAR" property="field1"/>
+        <result column="field2" jdbcType="VARCHAR" property="field2"/>
+        <result column="field3" jdbcType="VARCHAR" property="field3"/>
+    </resultMap>
+    <!--<select id="deviceByMac" parameterType="com.garry.zboot.modules.vstu.bean.DeviceBean" resultMap="BaseResultMap">
+
+    </select>-->
+    <select id="getVaildDevice" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT * FROM device t where t.id not in (SELECT device_id FROM user_device where is_delete =0)
+        <if test="deviceName!='' and deviceName != null">
+            and t.device_name = #{deviceName}
+        </if>
+        <if test="deviceMac!='' and deviceMac != null">
+            and t.device_mac = #{deviceMac}
+        </if>
+    </select>
+    <select id="getMonthDevice" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+        SELECT
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '1' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '1',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '2' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '2',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '3' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '3',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '4' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '4',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '5' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '5',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '6' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '6',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '7' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '7',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '8' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '8',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '9' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '9',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '10' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '10',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '11' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '11',
+	SUM(
+		CASE MONTH (create_time)
+		WHEN '12' THEN
+			1
+		ELSE
+			0
+		END
+	) AS '12'
+FROM
+	device
+WHERE
+YEAR (create_time) =#{year}
+    </select>
+	<select id="sumDevices" resultType="java.lang.Integer">
+		SELECT count(id) from device
+	</select>
+</mapper>
