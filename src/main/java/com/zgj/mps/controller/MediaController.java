@@ -42,9 +42,6 @@ public class MediaController extends BaseController<Media, Long> {
     private MediaService mediaService;
 
     @Autowired
-    private OSSClientUtil ossClientUtil;
-
-    @Autowired
     private RedisObjectManager redisObjectManager;
 
     @Override
@@ -73,6 +70,7 @@ public class MediaController extends BaseController<Media, Long> {
         for (String id : ids) {
             Media media = mediaService.get(Long.parseLong(id));
             mediaService.delete(Long.parseLong(id));
+            OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
             ossClientUtil.deleteFile(media.getPath());
             String jpgFilename = media.getPath().substring(0, media.getPath().lastIndexOf(".")) + ".jpg";
             ossClientUtil.deleteFile(jpgFilename);

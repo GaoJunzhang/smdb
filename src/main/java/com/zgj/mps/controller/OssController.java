@@ -38,9 +38,6 @@ import java.util.Random;
 @Transactional
 public class OssController {
 
-    @Autowired
-    private OSSClientUtil ossClientUtil;
-
     @Value("${video.dir}")
     private String videoDir;
 
@@ -64,6 +61,7 @@ public class OssController {
         String result = "";
         try {
             Random random = new Random();
+            OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
             String fileName = random.nextInt(10000) + System.currentTimeMillis()+"";
             result = ossClientUtil.uploadFileToOSS(file, "sysimg/"+fileName);
         } catch (IOException e) {
@@ -88,6 +86,7 @@ public class OssController {
 
             //1.上传oss,视频文件先上传服务器，转换为flv再上传oss
             if (type != 1) {
+                OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
                 result = ossClientUtil.uploadFileToOSS(file);
                 media.setPath(result);
                 media.setMd5(MD5Util.getMyMd5(media.getPath()));
@@ -142,6 +141,7 @@ public class OssController {
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public void delete(@RequestParam(name = "filePath") String filePath) {
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
         ossClientUtil.deleteFile(filePath);
     }
 
@@ -153,6 +153,7 @@ public class OssController {
         String fileName = random.nextInt(10000) + System.currentTimeMillis() + "";
         String result = null;
         try {
+            OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
             result = ossClientUtil.uploadFileToOSS(file, "sysimg/avatar/" + fileName);
             userService.updateAvatar(user.getId(),result);
         } catch (IOException e) {

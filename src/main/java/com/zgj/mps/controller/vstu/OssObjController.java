@@ -1,7 +1,7 @@
 package com.zgj.mps.controller.vstu;
 
 import com.aliyun.oss.model.OSSObject;
-import com.zgj.mps.tool.OssUtil;
+import com.zgj.mps.tool.OSSClientUtil;
 import com.zgj.mps.tool.ResultUtil;
 import com.zgj.mps.vo.OssItem;
 import com.zgj.mps.vo.OssPage;
@@ -31,13 +31,15 @@ public class OssObjController {
     @RequestMapping(value = "/ossData")
     @ApiOperation(value = "获取指定目录下的oss对象")
     public Result<Object> ossData(String dir) {
-        return new ResultUtil<Object>().setData(OssUtil.listAll(dir));
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+        return new ResultUtil<Object>().setData(ossClientUtil.listAll(dir));
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除")
     public Result<Object> delete(String key) {
-        OssUtil.delete(key);
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+        ossClientUtil.deleteFile(key);
         return new ResultUtil<Object>().setData("删除成功");
     }
 
@@ -47,7 +49,8 @@ public class OssObjController {
         if (keyStrs.length > 0) {
 
             List<String> keys = Arrays.asList(keyStrs);
-            OssUtil.deleteKeys(keys);
+            OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+            ossClientUtil.deleteKeys(keys);
             return new ResultUtil<Object>().setData("删除成功");
         }
         return new ResultUtil<Object>().setErrorMsg("失败");
@@ -57,7 +60,8 @@ public class OssObjController {
     @ApiOperation(value = "分页对象")
 //    @SystemLog(description = "分页对象",type = LogType.OPERATION)
     public Result<Object> pageOssData(@RequestParam(name = "dir",required = true) String dir, String nextMarker, @RequestParam(name = "maxKeys",defaultValue = "50")int maxKeys,String keyPrefix) {
-        OssPage ossObjes = OssUtil.listPage(dir, nextMarker, maxKeys,keyPrefix);
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+        OssPage ossObjes = ossClientUtil.listPage(dir, nextMarker, maxKeys,keyPrefix);
         List<OssItem> list = ossObjes.getSummaryList();
         List<OssItem> ossObjList = new ArrayList<>();
         int count = 0;
@@ -69,7 +73,7 @@ public class OssObjController {
             }
             ossObjList.add(ossItem);
         }
-        List<OssItem> ossItems = OssUtil.listAll(dir);
+        List<OssItem> ossItems = ossClientUtil.listAll(dir);
         Map<String,Object> map = new HashMap<>();
         map.put("summaryList",ossObjList);
         map.put("nextMarker",ossObjes.getNextMarker());
@@ -80,7 +84,8 @@ public class OssObjController {
     @RequestMapping(value = "/downloadFile")
     @ApiOperation(value = "下载对象")
     public void downloadFile(@RequestParam(name = "key",required = true) String key, HttpServletResponse response) throws IOException {
-        OSSObject ossObject = OssUtil.downloadFile(key);
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+        OSSObject ossObject = ossClientUtil.downloadFile(key);
         //通知浏览器以附件形式下载
         response.setHeader("Content-Disposition",
                 "attachment;filename=" + new String(key.getBytes(), "ISO-8859-1"));

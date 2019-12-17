@@ -6,7 +6,6 @@ import com.zgj.mps.dao.MediaRepository;
 import com.zgj.mps.model.Media;
 import com.zgj.mps.service.MediaService;
 import com.zgj.mps.service.UserService;
-import com.zgj.mps.tool.OSSClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,10 +43,6 @@ public class MediaServiceImpl implements MediaService {
     public MediaRepository getRepository() {
         return mediaRepository;
     }
-
-
-    @Autowired
-    public OSSClientUtil ossClientUtil;
 
     @Override
     public Map<String, Object> pageMediaData(Long mgroupId, String name, Short audit, Short type, long userId, Pageable pageable) {

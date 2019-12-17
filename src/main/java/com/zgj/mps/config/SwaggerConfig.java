@@ -60,8 +60,8 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Vstu Resource Api")
-                .description("Vstu Resource")
+                .title("System Api")
+                .description("System Resource")
                 .contact(new Contact("gaojunzhang", "http://127.0.0.1:8000/", "1228671674@qq.com"))
                 .build();
     }
