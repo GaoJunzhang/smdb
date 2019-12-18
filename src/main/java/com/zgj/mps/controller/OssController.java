@@ -44,9 +44,6 @@ public class OssController {
     @Autowired
     private MediaService mediaService;
 
-    @Value("${oss.accessUrl}")
-    private String accessUrl;
-
     @Autowired
     private UserService userService;
 
@@ -57,13 +54,13 @@ public class OssController {
     private ShiroSecurityUtil shiroSecurityUtil;
 
     @PostMapping(value = "/uploadAvatar")
-    public Result<String> uploadAvatar(@RequestParam(name = "file") MultipartFile file){
+    public Result<String> uploadAvatar(@RequestParam(name = "file") MultipartFile file) {
         String result = "";
         try {
             Random random = new Random();
             OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
-            String fileName = random.nextInt(10000) + System.currentTimeMillis()+"";
-            result = ossClientUtil.uploadFileToOSS(file, "sysimg/"+fileName);
+            String fileName = random.nextInt(10000) + System.currentTimeMillis() + "";
+            result = ossClientUtil.uploadFileToOSS(file, "sysimg/" + fileName);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResultUtil<String>().setErrorMsg("上传文件失败，请稍后再试");
@@ -85,14 +82,14 @@ public class OssController {
         try {
 
             //1.上传oss,视频文件先上传服务器，转换为flv再上传oss
+            OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
             if (type != 1) {
-                OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
                 result = ossClientUtil.uploadFileToOSS(file);
                 media.setPath(result);
                 media.setMd5(MD5Util.getMyMd5(media.getPath()));
-            }else {
+            } else {
                 media.setRemark("transitioning");
-                media.setPath(accessUrl);
+                media.setPath(ossClientUtil.getAccessUrl());
             }
             //2.保存数据库
             User user = shiroSecurityUtil.getCurrentUser();
@@ -126,7 +123,7 @@ public class OssController {
                 File f = File.createTempFile(tmpFileName, prefix, tmpFile);
                 file.transferTo(f);
                 newMedia.setName(f.getName());
-                newMedia.setPath(videoDir  + File.separator + f.getName());
+                newMedia.setPath(videoDir + File.separator + f.getName());
                 newMedia.setUser(media.getUser());
 //                ByteArrayOutputStream byteArrayOutputStream = FFmpegUtil.getVideoImage(f, 600, 800, 5);
 //                ossClientUtil.uploadByByteToOSS(byteArrayOutputStream.toByteArray(), f.getName().substring(0,f.getName().lastIndexOf(".")) + ".jpg");
@@ -155,7 +152,7 @@ public class OssController {
         try {
             OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
             result = ossClientUtil.uploadFileToOSS(file, "sysimg/avatar/" + fileName);
-            userService.updateAvatar(user.getId(),result);
+            userService.updateAvatar(user.getId(), result);
         } catch (IOException e) {
             e.printStackTrace();
         }
