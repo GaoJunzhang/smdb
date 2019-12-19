@@ -1,6 +1,6 @@
 package com.zgj.mps.config;
 
-import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,6 +14,7 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +24,12 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig extends WebMvcConfigurationSupport {
+    @Value("${file.dir}")
+    private String fileDir;
 
     private List<ApiKey> securitySchemes() {
         List<ApiKey> apiKeys = new ArrayList<>();
-        apiKeys.add(new ApiKey("Authorization", "Access-Token","header"));
+        apiKeys.add(new ApiKey("Authorization", "Access-Token", "header"));
         return apiKeys;
     }
 
@@ -70,6 +73,7 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/webfile/**").addResourceLocations("file:" + fileDir + File.separator);
         super.addResourceHandlers(registry);
     }
 }

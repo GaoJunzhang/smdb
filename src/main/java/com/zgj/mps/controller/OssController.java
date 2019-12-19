@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +37,7 @@ import java.util.Random;
 @Transactional
 public class OssController {
 
-    @Value("${video.dir}")
+    @Value("${file.dir}")
     private String videoDir;
 
     @Autowired
@@ -52,6 +51,18 @@ public class OssController {
 
     @Autowired
     private ShiroSecurityUtil shiroSecurityUtil;
+
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+    public Result<String> uploadFile(@RequestParam(required = false) MultipartFile file){
+        OSSClientUtil ossClientUtil = OSSClientUtil.getInstance();
+        try {
+            Random random = new Random();
+            String fileName = random.nextInt(10000) + System.currentTimeMillis() + "";
+            return new ResultUtil<String>().setData(ossClientUtil.uploadFileAndBackFullPath(file,"blog/img/" + fileName));
+        } catch (IOException e) {
+            return new ResultUtil<String>().setErrorMsg("请求异常");
+        }
+    }
 
     @PostMapping(value = "/uploadAvatar")
     public Result<String> uploadAvatar(@RequestParam(name = "file") MultipartFile file) {

@@ -63,7 +63,7 @@ public class OSSClientUtil {
             ossDir = PropertiesUtil.getString("oss.dir", "mpsoss/");
             log.info("本地上传目录=====================>>>>>>>>>>>>>>>>>>{}", fileDir);
             log.info("本地上传文件=====================>>>>>>>>>>>>>>>>>>{}", ossDir);
-            String serverUrl = systemSettingService.getSetting("server_url", "http://localhost:9999/");
+            String serverUrl = systemSettingService.getSetting("server_url", "http://localhost:8888/");
             log.info("本地服务器地址{}", serverUrl);
             accessUrl = serverUrl + "/webfile";
         }
@@ -257,6 +257,18 @@ public class OSSClientUtil {
         } else {
             return uploadFileToOSS(file, fileName);
         }
+    }
+
+    public String uploadFileAndBackFullPath(MultipartFile file, String fileName) throws IOException {
+        OSSClient ossClient = getOssClient();
+           String result = "";
+        if (ossClient == null) {
+            result = uploadFile(file,fileName);
+            result = result.replaceAll("\\\\","/");
+        } else {
+            result = uploadFile(file,fileName);
+        }
+        return accessUrl + "/" + result;
     }
 
     /**

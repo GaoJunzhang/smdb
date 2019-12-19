@@ -49,7 +49,7 @@ public class MediaController extends BaseController<Media, Long> {
         return mediaService;
     }
 
-    @Value("${video.dir}")
+    @Value("${file.dir}")
     private String videoDir;
 
     @RequestMapping(value = "/getMediaData", method = RequestMethod.GET)
