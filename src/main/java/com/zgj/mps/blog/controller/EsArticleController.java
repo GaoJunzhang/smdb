@@ -36,7 +36,7 @@ public class EsArticleController {
         return new ResultUtil<Object>().setData(es);
     }
 
-    @PutMapping(value = "/add")
+    @PostMapping(value = "/add")
     @ApiOperation("添加文章")
     public Result<Object> add(@ModelAttribute Article article) {
         User user = shiroSecurityUtil.getCurrentUser();

@@ -110,7 +110,8 @@ public class MenuController {
         auth.setHidden(hidden);
         auth.setPath(path);
         auth.setComponent(component);
-        return new ResultUtil<Auth>().setData(menuService.save(auth));
+        menuService.save(auth);
+        return new ResultUtil<Auth>().setSuccessMsg("success");
     }
 
     private String getAuthCode(Long parentId, String parentCode) {

@@ -36,6 +36,7 @@ public class ShiroConfig {
         //前后端带login登录的或者其他登录的通通放行
         filterChainDefinitionMap.put("/auth/register", "anon");
         filterChainDefinitionMap.put("/kaptcha/**", "anon");
+        filterChainDefinitionMap.put("/webapi/**", "anon");
         filterChainDefinitionMap.put("/druid/**", "anon");
         filterChainDefinitionMap.put("/webfile/**", "anon");
         filterChainDefinitionMap.put("/swagger-resources", "anon");
