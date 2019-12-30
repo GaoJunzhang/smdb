@@ -10659,13 +10659,13 @@ function initArticle(type) {
                 imgs = v.imgs.split(',')
                 console.log("我的图片")
                 console.log(imgs)
-                if (imgs.length == 1) {
-                    articleHtml += '<figure>' +
-                        '<img src="' + imgs[0] + '" alt="">' +
-                        '<noscript><img src="' + imgs[0] + '"/></noscript>' +
-                        '<figcaption>' + v.imgDesc + '</figcaption>' +
-                        '</figure>'
-                }
+                // if (imgs.length == 1) {
+                //     articleHtml += '<figure>' +
+                //         '<img src="' + imgs[0] + '" alt="">' +
+                //         '<noscript><img src="' + imgs[0] + '"/></noscript>' +
+                //         '<figcaption>' + v.imgDesc + '</figcaption>' +
+                //         '</figure>'
+                // }
                 if (v.wedge != null && v.wedge != '' && v.wedge != 'undefined') {
                     articleHtml += '<div class="quote">' +
                         '<p class="line-through"><span><a href="#">春·夏·秋·冬</a></span></p>' +
@@ -10677,21 +10677,21 @@ function initArticle(type) {
                         '                <cite class="line-through"><span>月令</span></cite>' +
                         '            </div>'
                 }
-                if (imgs.length > 1) {
-                    articleHtml += '<div class="gallery">'
-                    imgs.forEach(function (j, c) {
-                        articleHtml += '<div class="img_box blur">' +
-                            '                     <a rel="gallery-1" href="' + j + '" class="swipebox-gallery">' +
-                            '                         <img src="' + j + '" alt="image">' +
-                            '                         <noscript><img src="' + j + '"/></noscript>' +
-                            '                     </a>' +
-                            '                 </div>'
-                    })
-
-                    articleHtml += '</div>'
-                }
+                // if (imgs.length > 1) {
+                //     articleHtml += '<div class="gallery">'
+                //     imgs.forEach(function (j, c) {
+                //         articleHtml += '<div class="img_box blur">' +
+                //             '                     <a rel="gallery-1" href="' + j + '" class="swipebox-gallery">' +
+                //             '                         <img src="' + j + '" alt="image">' +
+                //             '                         <noscript><img src="' + j + '"/></noscript>' +
+                //             '                     </a>' +
+                //             '                 </div>'
+                //     })
+                //
+                //     articleHtml += '</div>'
+                // }
                 articleHtml += '<div class="meta-data">' +
-                    '                 <h3><a href="#">' + v.author + '</a></h3>' +
+                    '                 <h3><a href="#">' + v.title + '</a></h3>' +
                     '                 <p class="author">' +
                     '                     <time datetime="">' + v.lunarCalendar + '</time>' +
                     '                 </p>' +
@@ -10713,6 +10713,19 @@ function initArticle(type) {
                     '                 <li><a href="#" class="tag">Kirby</a></li>' +
                     '             </ul>' +
                     '         </footer>'
+                if (imgs.length > 1) {
+                    articleHtml += '<div class="gallery">'
+                    imgs.forEach(function (j, c) {
+                        articleHtml += '<div class="img_box blur">' +
+                            '                     <a rel="gallery-1" href="' + j + '" class="swipebox-gallery">' +
+                            '                         <img src="' + j + '" alt="image">' +
+                            '                         <noscript><img src="' + j + '"/></noscript>' +
+                            '                     </a>' +
+                            '                 </div>'
+                    })
+
+                    articleHtml += '</div>'
+                }
                 articleHtml += '</article>'
                 $('#svue').html(articleHtml)
                 $('.article #info').readmore({
@@ -10723,6 +10736,7 @@ function initArticle(type) {
                     heightMargin: 20,
                     afterToggle: function (trigger, element, expanded) {
                         if (!expanded) { // The "Close" link was clicked
+                            console.log('展开的位置', element.offset().top)
                             $('html, body').animate({scrollTop: element.offset().top}, {duration: 300});
                         }
                     }
