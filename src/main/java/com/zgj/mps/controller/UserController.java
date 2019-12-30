@@ -1,6 +1,7 @@
 package com.zgj.mps.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.zgj.mps.controller.request.ChangePasswordRequest;
 import com.zgj.mps.generator.base.BaseController;
 import com.zgj.mps.model.User;
@@ -103,6 +104,21 @@ public class UserController extends BaseController<User, Long> {
     public Object changePassword(HttpSession session, @RequestBody ChangePasswordRequest request) {
         long userId = (long) session.getAttribute("userId");
         return userService.changePassword(userId, request);
+    }
+
+    @PostMapping(value = "/changeTheme")
+    @ApiOperation(value = "修改系统主题风格")
+    public Object changeTheme(HttpSession session, String navTheme, String theme) {
+        long userId = (long) session.getAttribute("userId");
+        User user = userService.get(userId);
+        if (StrUtil.isNotEmpty(navTheme)) {
+            user.setNavTheme(navTheme);
+        }
+        if (StrUtil.isNotEmpty(theme)) {
+            user.setThemeColor(theme);
+        }
+        userService.update(user);
+        return new ResultUtil<>().setSuccessMsg("修改成功");
     }
 
     @GetMapping(value = "/sumUser")

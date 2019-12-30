@@ -38,4 +38,6 @@ public class User extends BaseEntity implements java.io.Serializable {
     private Timestamp loginTime;
     private String mobile;
     private String avatar;
+    private String navTheme;
+    private String themeColor;
 }

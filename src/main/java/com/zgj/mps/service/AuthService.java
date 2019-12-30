@@ -146,6 +146,8 @@ public class AuthService {
         Map<String, Object> map = CommonUtil.defaultResponse(0, "");
         map.put("name", user.getName());
         map.put("avatar", user.getAvatar());
+        map.put("navTheme", user.getNavTheme());
+        map.put("themeColor",user.getThemeColor());
         try {
             map.put("role", userRoleService.getUserRoleAuths(userId));
             map.put("menus", roleAuthService.getUserRouters(userId));
