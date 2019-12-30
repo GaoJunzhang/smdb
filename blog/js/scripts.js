@@ -10643,13 +10643,14 @@ function initArticle(type) {
         //请求的媒体类型
         contentType: "application/json;charset=UTF-8",
         //请求地址
-        url: "http://127.0.0.1:8888/zboot/blog/es/article/getAllByPage",
+        url: "http://127.0.0.1:9999/zboot/webapi/getAllByPage",
         //数据，json字符串
         dataType: 'json',
         // data : JSON.stringify(list),
         data:params,
         //请求成功
         success: function (res) {
+            console.log('sssss', res)
             var articles = res.result.content
             console.log(res)
             articles.forEach(function (v, k) {
